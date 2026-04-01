@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<div style="text-align: center; margin-bottom: 20px;">
+    <img src="amrita_logo1.png" alt="Amrita Logo" style="height: 80px;"><br>
+    <h1 style="margin: 10px 0;">Conditional Jump Compiler</h1>
+</div>
+<title>Conditional Jump Compiler — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0f;
+  --bg2:#111118;
+  --bg3:#181820;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.13);
+  --txt:#e8e8f0;
+  --txt2:#8888a8;
+  --txt3:#555570;
+  --acc:#00e5ff;
+  --acc2:#ff6b6b;
+  --acc3:#69ff88;
+  --acc4:#ffb347;
+  --acc5:#c084fc;
+  --mono:'JetBrains Mono',monospace;
+  --head:'Bebas Neue',sans-serif;
+  --body:'DM Sans',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--body);}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
+
+/* HEADER */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,10,15,0.95);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:linear-gradient(135deg,#00e5ff22,#00e5ff44);
+  border:1px solid #00e5ff44;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.logo-text{font-family:var(--head);font-size:22px;letter-spacing:2px;color:var(--acc);}
+.logo-sub{font-size:10px;color:var(--txt2);letter-spacing:1px;margin-top:-2px;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.hbadge{
+  font-size:10px;font-family:var(--mono);font-weight:600;
+  padding:4px 10px;border-radius:20px;letter-spacing:0.5px;
+}
+.hbadge.v{background:rgba(0,229,255,0.1);color:var(--acc);border:1px solid rgba(0,229,255,0.2);}
+.hbadge.py{background:rgba(105,255,136,0.1);color:var(--acc3);border:1px solid rgba(105,255,136,0.2);}
+
+/* MAIN LAYOUT */
+.main{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 61px);overflow:hidden;}
+
+/* LEFT PANEL */
+.left{
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  background:var(--bg2);
+  overflow:hidden;
+}
+.panel-title{
+  padding:14px 18px 10px;
+  font-size:10px;font-weight:600;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--txt2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.pt-dot{width:6px;height:6px;border-radius:50%;}
+
+.editor-wrap{flex:1;display:flex;flex-direction:column;padding:14px;gap:10px;overflow:hidden;}
+
+.code-editor{
+  flex:1;
+  background:#0d0d14;
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:#c9d1d9;
+  font-family:var(--mono);
+  font-size:12px;
+  padding:14px;
+  resize:none;
+  outline:none;
+  line-height:1.7;
+  transition:border-color 0.2s;
+  min-height:160px;
+}
+.code-editor:focus{border-color:rgba(0,229,255,0.3);}
+
+.examples-label{font-size:10px;color:var(--txt2);font-weight:500;letter-spacing:0.5px;}
+.examples-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.ex-btn{
+  font-size:10px;font-family:var(--mono);
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:5px;color:var(--acc);
+  padding:4px 10px;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;
+}
+.ex-btn:hover{background:rgba(0,229,255,0.08);border-color:rgba(0,229,255,0.3);}
+
+.compile-btn{
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,#00e5ff18,#00e5ff28);
+  border:1px solid rgba(0,229,255,0.35);
+  border-radius:10px;
+  color:var(--acc);
+  font-family:var(--head);
+  font-size:18px;letter-spacing:3px;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.compile-btn:hover{
+  background:rgba(0,229,255,0.12);
+  box-shadow:0 0 24px rgba(0,229,255,0.15);
+  transform:translateY(-1px);
+}
+.compile-btn:active{transform:translateY(0);}
+.compile-btn svg{transition:transform 0.2s;}
+.compile-btn:hover svg{transform:translateX(3px);}
+
+.stats-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+}
+.stat{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:8px;padding:8px;text-align:center;
+}
+.stat-n{font-size:20px;font-weight:600;font-family:var(--head);color:var(--acc3);letter-spacing:1px;}
+.stat-l{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:0.8px;margin-top:1px;}
+
+.err-box{
+  background:rgba(255,107,107,0.08);
+  border:1px solid rgba(255,107,107,0.25);
+  border-radius:8px;padding:10px 12px;
+  font-family:var(--mono);font-size:11px;color:var(--acc2);
+  display:none;
+}
+
+/* RIGHT — PHASES GRID */
+.right{overflow-y:auto;padding:18px;background:var(--bg);}
+
+.phases-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.phases-title{font-family:var(--head);font-size:28px;letter-spacing:3px;color:var(--txt);}
+.opt-pill{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(105,255,136,0.08);
+  border:1px solid rgba(105,255,136,0.2);
+  border-radius:20px;padding:5px 12px;
+  font-size:11px;color:var(--acc3);font-weight:500;
+  opacity:0;transition:opacity 0.4s;
+}
+.opt-pill.show{opacity:1;}
+
+.phases-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.phase-card{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  transition:border-color 0.3s,box-shadow 0.3s;
+  display:flex;flex-direction:column;
+  min-height:260px;
+}
+.phase-card.active{
+  border-color:rgba(0,229,255,0.2);
+  box-shadow:0 0 20px rgba(0,229,255,0.05);
+}
+.phase-card.done-card{border-color:rgba(105,255,136,0.15);}
+
+.card-head{
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  background:rgba(0,0,0,0.2);
+}
+.phase-num{
+  font-family:var(--head);font-size:28px;letter-spacing:1px;
+  color:var(--txt3);line-height:1;transition:color 0.3s;
+  min-width:28px;
+}
+.phase-card.done-card .phase-num{color:var(--acc3);}
+.phase-card.active .phase-num{color:var(--acc);}
+.card-meta{flex:1;}
+.card-name{font-size:12px;font-weight:600;color:var(--txt);letter-spacing:0.3px;}
+.card-desc{font-size:10px;color:var(--txt2);margin-top:2px;}
+.card-badge{
+  font-size:9px;font-family:var(--mono);font-weight:600;
+  padding:3px 7px;border-radius:4px;
+  background:rgba(255,255,255,0.05);color:var(--txt2);
+  transition:all 0.3s;white-space:nowrap;
+}
+.phase-card.done-card .card-badge{
+  background:rgba(105,255,136,0.1);color:var(--acc3);
+}
+
+.card-body{
+  flex:1;padding:12px 14px;overflow-y:auto;
+  max-height:220px;font-size:11px;
+  scrollbar-width:thin;
+}
+
+/* placeholder */
+.placeholder{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:8px;color:var(--txt3);font-size:11px;padding:20px;text-align:center;
+}
+.ph-icon{font-size:24px;opacity:0.4;}
+
+/* token grid */
+.tok-grid{display:flex;flex-wrap:wrap;gap:5px;}
+.tok{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:5px;padding:4px 7px;
+}
+.tok-val{font-family:var(--mono);font-weight:600;font-size:10px;}
+.tok-type{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:0.3px;}
+
+/* tree (legacy text fallback) */
+.tree{
+  font-family:var(--mono);font-size:11px;line-height:1.8;
+  background:rgba(0,0,0,0.25);border-radius:7px;padding:10px;
+}
+
+/* AST Visual Tree */
+.ast-tree-wrap{
+  width:100%;overflow:auto;
+  background:rgba(0,0,0,0.3);border-radius:8px;
+  padding:6px 0;
+}
+.ast-tree-wrap svg{display:block;overflow:visible;}
+.ast-node-group{cursor:pointer;}
+.ast-node-rect{
+  rx:6;ry:6;
+  stroke-width:1.5;
+  transition:filter 0.2s;
+}
+.ast-node-group:hover .ast-node-rect{filter:brightness(1.3);}
+.ast-edge{stroke-width:1.5;stroke-dasharray:none;opacity:0.55;}
+.ast-node-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:600;
+  dominant-baseline:middle;text-anchor:middle;
+  pointer-events:none;
+}
+.ast-node-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px;font-weight:400;
+  dominant-baseline:middle;text-anchor:middle;
+  pointer-events:none;opacity:0.75;
+}
+/* AST toggle tabs */
+.ast-toggle-bar{
+  display:flex;gap:6px;margin-bottom:8px;
+}
+.ast-tab{
+  font-size:10px;font-family:var(--mono);font-weight:600;
+  padding:3px 10px;border-radius:5px;cursor:pointer;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  color:var(--txt2);transition:all 0.15s;
+}
+.ast-tab.active{
+  background:rgba(0,229,255,0.1);
+  border-color:rgba(0,229,255,0.35);
+  color:var(--acc);
+}
+.ast-tab:hover:not(.active){
+  background:rgba(255,255,255,0.07);color:var(--txt);
+}
+.ast-view{width:100%;}
+
+/* Syntax card gets more height */
+#card1{min-height:340px;}
+#card1 .card-body{max-height:310px;}
+.kw{color:var(--acc5);}
+.id{color:var(--acc3);}
+.op{color:var(--acc4);}
+.lit{color:var(--acc2);}
+.lbl{color:var(--acc);}
+.cmt{color:var(--txt3);}
+
+/* sym table */
+.sym-tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px;}
+.sym-tbl th{
+  background:rgba(0,0,0,0.3);color:var(--txt2);
+  padding:5px 8px;text-align:left;font-size:9px;letter-spacing:0.5px;
+  border-bottom:1px solid var(--border);
+}
+.sym-tbl td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--txt);}
+.sym-tbl td:first-child{color:var(--acc3);}
+.sym-tbl td:nth-child(2){color:var(--acc5);}
+.sym-tbl tr:last-child td{border-bottom:none;}
+
+/* IR lines */
+.ir-line{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:10px;
+  padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.ir-line:last-child{border-bottom:none;}
+.ir-line.elim{opacity:0.3;text-decoration:line-through;color:var(--acc2);}
+.ir-n{color:var(--txt3);font-size:9px;min-width:20px;text-align:right;}
+.ir-lbl{color:var(--acc);font-weight:700;}
+.ir-op{color:var(--acc5);}
+.ir-arg{color:var(--acc4);}
+.elim-tag{
+  font-size:8px;margin-left:auto;
+  background:rgba(255,107,107,0.12);color:var(--acc2);
+  padding:1px 5px;border-radius:3px;font-weight:600;
+}
+
+/* asm */
+.asm-out{
+  font-family:var(--mono);font-size:11px;line-height:1.9;
+  background:rgba(0,0,0,0.3);border-radius:7px;padding:10px 12px;
+}
+.asm-lbl{color:var(--acc);font-weight:700;}
+.asm-jmp{color:var(--acc3);font-weight:600;}
+.asm-ins{color:var(--acc5);}
+.asm-op{color:var(--acc4);}
+.asm-cmt{color:var(--txt3);font-size:10px;}
+
+/* opt changes */
+.opt-change{
+  font-size:10px;font-family:var(--mono);
+  padding:4px 8px 4px 10px;
+  border-left:2px solid var(--acc3);
+  margin-bottom:5px;color:var(--txt2);
+  background:rgba(105,255,136,0.04);border-radius:0 5px 5px 0;
+}
+.no-opt{font-size:10px;color:var(--txt2);font-family:var(--mono);font-style:italic;}
+
+/* warn */
+.warn-line{font-size:10px;color:var(--acc4);font-family:var(--mono);padding:3px 0;}
+
+/* PIPELINE BAR */
+.pipeline{
+  display:flex;align-items:center;gap:0;
+  padding:10px 18px;
+  border-top:1px solid var(--border);
+  background:var(--bg2);
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.pipeline::-webkit-scrollbar{display:none;}
+.pipe-step{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:600;letter-spacing:0.5px;
+  color:var(--txt3);white-space:nowrap;
+  transition:color 0.3s;
+}
+.pipe-step.done{color:var(--acc3);}
+.pipe-step.active{color:var(--acc);}
+.pipe-dot{width:8px;height:8px;border-radius:50%;background:var(--txt3);transition:background 0.3s;flex-shrink:0;}
+.pipe-step.done .pipe-dot{background:var(--acc3);}
+.pipe-step.active .pipe-dot{background:var(--acc);box-shadow:0 0 8px var(--acc);}
+.pipe-arrow{color:var(--txt3);margin:0 8px;font-size:12px;}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.phase-card{animation:fadeIn 0.3s ease both;}
+.phase-card:nth-child(1){animation-delay:0s;}
+.phase-card:nth-child(2){animation-delay:0.05s;}
+.phase-card:nth-child(3){animation-delay:0.1s;}
+.phase-card:nth-child(4){animation-delay:0.15s;}
+.phase-card:nth-child(5){animation-delay:0.2s;}
+.phase-card:nth-child(6){animation-delay:0.25s;}
+
+/* Language selector */
+.lang-selector-wrap{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:2px;
+}
+.lang-label{font-size:10px;color:var(--txt2);font-weight:500;letter-spacing:0.5px;white-space:nowrap;}
+.lang-select{
+  flex:1;
+  background:#0d0d14;
+  border:1px solid var(--border2);
+  border-radius:7px;
+  color:var(--acc);
+  font-family:var(--mono);
+  font-size:11px;
+  font-weight:600;
+  padding:6px 10px;
+  outline:none;
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2300e5ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  padding-right:28px;
+  transition:border-color 0.2s;
+}
+.lang-select:hover{border-color:rgba(0,229,255,0.4);}
+.lang-select:focus{border-color:rgba(0,229,255,0.5);}
+.lang-select option{background:#111118;color:var(--txt);}
+.lang-indicator{
+  display:flex;align-items:center;gap:5px;
+  font-size:9px;font-family:var(--mono);
+  color:var(--txt2);padding:3px 8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:4px;white-space:nowrap;
+}
+.lang-dot{width:6px;height:6px;border-radius:50%;background:var(--acc3);}
+
+@media(max-width:1100px){
+  .main{grid-template-columns:280px 1fr;}
+  .phases-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:800px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:auto;}
+  .left{height:auto;}
+  .right{height:auto;}
+  .phases-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚙</div>
+    <div>
+      <div class="logo-text">CJUMP COMPILER</div>
+      <div class="logo-sub">All 6 Phases Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="lang-indicator"><div class="lang-dot"></div><span id="lang-status">Custom Lang</span></div>
+    <select class="lang-select" id="lang-select" onchange="onLangChange(this.value)">
+      <option value="custom" selected>🔧 Custom Language</option>
+      <option value="c">🇨 C</option>
+      <option value="python">🐍 Python</option>
+      <option value="java">☕ Java</option>
+      <option value="cpp">⚙️ C++</option>
+    </select>
+    <span class="hbadge v">v1.0</span>
+  </div>
+</div>
+
+<div class="main">
+  <!-- LEFT: INPUT -->
+  <div class="left">
+    <div class="panel-title">
+      <div class="pt-dot" style="background:var(--acc)"></div>
+      Source Code Input
+    </div>
+    <div class="editor-wrap">
+      <textarea class="code-editor" id="src" spellcheck="false">if x == 0 goto L1
+if y != 5 goto L2
+while z < 10
+  z = z + 1
+end
+L1: x = 1
+L2: y = 2</textarea>
+
+      <div class="examples-label">Quick Examples</div>
+      <div class="examples-grid">
+        <button class="ex-btn" onclick="loadEx(0)">Basic goto</button>
+        <button class="ex-btn" onclick="loadEx(1)">While loop</button>
+        <button class="ex-btn" onclick="loadEx(2)">Nested if</button>
+        <button class="ex-btn" onclick="loadEx(3)">Optimizer</button>
+        <button class="ex-btn" onclick="loadEx(4)">Full test</button>
+      </div>
+
+      <div class="stats-strip" id="stats-strip">
+        <div class="stat"><div class="stat-n" id="st0">—</div><div class="stat-l">Tokens</div></div>
+        <div class="stat"><div class="stat-n" id="st1">—</div><div class="stat-l">IR Lines</div></div>
+        <div class="stat"><div class="stat-n" id="st2" style="color:var(--acc2)">—</div><div class="stat-l">Eliminated</div></div>
+      </div>
+
+      <button class="compile-btn" onclick="compile()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
+        COMPILE
+      </button>
+      <div class="err-box" id="err-box"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: PHASES -->
+  <div class="right">
+    <div class="phases-header">
+      <div class="phases-title">COMPILER PHASES</div>
+      <div class="opt-pill" id="opt-pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="opt-pill-txt">0 jumps optimized</span>
+      </div>
+    </div>
+
+    <div class="phases-grid">
+      <!-- Card 1: Lexer -->
+      <div class="phase-card" id="card0">
+        <div class="card-head">
+          <div class="phase-num">01</div>
+          <div class="card-meta">
+            <div class="card-name">Lexical Analysis</div>
+            <div class="card-desc">Tokenizes source code</div>
+          </div>
+          <div class="card-badge" id="badge0">pending</div>
+        </div>
+        <div class="card-body" id="body0">
+          <div class="placeholder"><div class="ph-icon">⌨</div><div>Waiting for input</div></div>
+        </div>
+      </div>
+
+      <!-- Card 2: Parser -->
+      <div class="phase-card" id="card1">
+        <div class="card-head">
+          <div class="phase-num">02</div>
+          <div class="card-meta">
+            <div class="card-name">Syntax Analysis</div>
+            <div class="card-desc">Builds Abstract Syntax Tree</div>
+          </div>
+          <div class="card-badge" id="badge1">pending</div>
+        </div>
+        <div class="card-body" id="body1">
+          <div class="placeholder"><div class="ph-icon">🌲</div><div>Waiting for lexer</div></div>
+        </div>
+      </div>
+
+      <!-- Card 3: Semantic -->
+      <div class="phase-card" id="card2">
+        <div class="card-head">
+          <div class="phase-num">03</div>
+          <div class="card-meta">
+            <div class="card-name">Semantic Analysis</div>
+            <div class="card-desc">Symbol table & label checks</div>
+          </div>
+          <div class="card-badge" id="badge2">pending</div>
+        </div>
+        <div class="card-body" id="body2">
+          <div class="placeholder"><div class="ph-icon">🔎</div><div>Waiting for parser</div></div>
+        </div>
+      </div>
+
+      <!-- Card 4: IR -->
+      <div class="phase-card" id="card3">
+        <div class="card-head">
+          <div class="phase-num">04</div>
+          <div class="card-meta">
+            <div class="card-name">IR Generation</div>
+            <div class="card-desc">3-address intermediate code</div>
+          </div>
+          <div class="card-badge" id="badge3">pending</div>
+        </div>
+        <div class="card-body" id="body3">
+          <div class="placeholder"><div class="ph-icon">📄</div><div>Waiting for semantic</div></div>
+        </div>
+      </div>
+
+      <!-- Card 5: Optimizer -->
+      <div class="phase-card" id="card4">
+        <div class="card-head">
+          <div class="phase-num">05</div>
+          <div class="card-meta">
+            <div class="card-name">Optimization</div>
+            <div class="card-desc">Eliminates redundant jumps</div>
+          </div>
+          <div class="card-badge" id="badge4">pending</div>
+        </div>
+        <div class="card-body" id="body4">
+          <div class="placeholder"><div class="ph-icon">⚡</div><div>Waiting for IR</div></div>
+        </div>
+      </div>
+
+      <!-- Card 6: Codegen -->
+      <div class="phase-card" id="card5">
+        <div class="card-head">
+          <div class="phase-num">06</div>
+          <div class="card-meta">
+            <div class="card-name">Code Generation</div>
+            <div class="card-desc">Final assembly output</div>
+          </div>
+          <div class="card-badge" id="badge5">pending</div>
+        </div>
+        <div class="card-body" id="body5">
+          <div class="placeholder"><div class="ph-icon">🖥</div><div>Waiting for optimizer</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PIPELINE BAR -->
+<div class="pipeline" id="pipeline">
+  <div class="pipe-step" id="ps0"><div class="pipe-dot"></div>Lexer</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step" id="ps1"><div class="pipe-dot"></div>Parser</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step" id="ps2"><div class="pipe-dot"></div>Semantic</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step" id="ps3"><div class="pipe-dot"></div>IR Gen</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step" id="ps4"><div class="pipe-dot"></div>Optimizer</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step" id="ps5"><div class="pipe-dot"></div>Codegen</div>
+</div>
+
+<script>
+const EXAMPLES=[
+`if x == 0 goto L1
+x = x + 1
+L1: y = 2`,
+`while i < 10
+  i = i + 1
+end`,
+`if a > b goto L1
+if b > c goto L2
+c = 0
+goto L3
+L1: a = 0
+L2: b = 0
+L3: done = 1`,
+`if x == 0 goto L1
+goto L1
+L1: x = 1`,
+`if a == 0 goto L1
+if b != 5 goto L2
+while z < 10
+  z = z + 1
+end
+L1: a = 1
+L2: b = 2`
+];
+function loadEx(i){document.getElementById('src').value=EXAMPLES[i];}
+
+// ── LEXER ──────────────────────────────────────────────────────────
+const KW_MAP={if:'IF',while:'WHILE',goto:'GOTO',end:'END'};
+function tokenize(src){
+  const toks=[];
+  const lines=src.split('\n');
+  for(let ln=0;ln<lines.length;ln++){
+    const line=lines[ln];
+    let i=0;
+    while(i<line.length){
+      if(line[i]===' '||line[i]==='\t'){i++;continue;}
+      if(line[i]==='#')break;
+      if(/[a-zA-Z_]/.test(line[i])){
+        let w='';
+        while(i<line.length&&/[a-zA-Z0-9_]/.test(line[i]))w+=line[i++];
+        if(i<line.length&&line[i]===':'){i++;toks.push({t:'LABEL_DEF',v:w,ln:ln+1});}
+        else toks.push({t:KW_MAP[w.toLowerCase()]||'ID',v:w,ln:ln+1});
+      } else if(/[0-9]/.test(line[i])){
+        let n='';while(i<line.length&&/[0-9.]/.test(line[i]))n+=line[i++];
+        toks.push({t:'NUM',v:n,ln:ln+1});
+      } else {
+        const c=line[i++];
+        if(c==='='&&line[i]==='='){i++;toks.push({t:'EQ',v:'==',ln:ln+1});}
+        else if(c==='!'&&line[i]==='='){i++;toks.push({t:'NEQ',v:'!=',ln:ln+1});}
+        else if(c==='<'&&line[i]==='='){i++;toks.push({t:'LTE',v:'<=',ln:ln+1});}
+        else if(c==='>'&&line[i]==='='){i++;toks.push({t:'GTE',v:'>=',ln:ln+1});}
+        else if(c==='<')toks.push({t:'LT',v:'<',ln:ln+1});
+        else if(c==='>')toks.push({t:'GT',v:'>',ln:ln+1});
+        else if(c==='=')toks.push({t:'ASSIGN',v:'=',ln:ln+1});
+        else if(c==='+')toks.push({t:'PLUS',v:'+',ln:ln+1});
+        else if(c==='-')toks.push({t:'MINUS',v:'-',ln:ln+1});
+        else if(c==='*')toks.push({t:'MUL',v:'*',ln:ln+1});
+        else if(c==='/')toks.push({t:'DIV',v:'/',ln:ln+1});
+      }
+    }
+    toks.push({t:'NL',v:'',ln:ln+1});
+  }
+  toks.push({t:'EOF',v:'',ln:0});
+  return toks;
+}
+
+// ── PARSER ─────────────────────────────────────────────────────────
+function parse(toks){
+  let p=0;
+  const cur=()=>toks[p];
+  const eat=(t)=>{if(cur().t!==t)throw new Error(`Line ${cur().ln}: expected ${t} got ${cur().t}`);return toks[p++];};
+  const skip=()=>{while(cur().t==='NL')p++;};
+  const NEG={'>':'<=','<':'>=','>=':'<','<=':'>','==':'!=','!=':'=='};
+  const stmts=[];
+  function stmt(){
+    skip();
+    const t=cur();
+    if(t.t==='EOF')return null;
+    if(t.t==='LABEL_DEF'){p++;skip();return{kind:'label',name:t.v,line:t.ln};}
+    if(t.t==='IF'){
+      p++;const lhs=eat('ID').v;const op=toks[p++].v;const rhs=toks[p++].v;
+      if(cur().t==='GOTO'){p++;const tgt=toks[p++].v;skip();return{kind:'cjump',lhs,op,rhs,target:tgt,line:t.ln};}
+      skip();const body=[];
+      while(cur().t!=='END'&&cur().t!=='EOF'){skip();const s=stmt();if(s)body.push(s);}
+      if(cur().t==='END')p++;skip();
+      return{kind:'if',lhs,op,rhs,body,line:t.ln};
+    }
+    if(t.t==='WHILE'){
+      p++;const lhs=eat('ID').v;const op=toks[p++].v;const rhs=toks[p++].v;
+      skip();const body=[];
+      while(cur().t!=='END'&&cur().t!=='EOF'){skip();const s=stmt();if(s)body.push(s);}
+      if(cur().t==='END')p++;skip();
+      return{kind:'while',lhs,op,rhs,body,line:t.ln};
+    }
+    if(t.t==='GOTO'){p++;const tgt=toks[p++].v;skip();return{kind:'goto',target:tgt,line:t.ln};}
+    if(t.t==='ID'&&toks[p+1]&&toks[p+1].t==='ASSIGN'){
+      const lhs=t.v;p+=2;
+      const a=toks[p++].v;
+      if(['PLUS','MINUS','MUL','DIV'].includes(cur().t)){
+        const bop=toks[p++].v;const b=toks[p++].v;skip();
+        return{kind:'assign',lhs,rhs:{op:bop,a,b},line:t.ln};
+      }
+      skip();return{kind:'assign',lhs,rhs:a,line:t.ln};
+    }
+    p++;return null;
+  }
+  while(cur().t!=='EOF'){const s=stmt();if(s)stmts.push(s);}
+  return stmts;
+}
+
+// ── SEMANTIC ───────────────────────────────────────────────────────
+function semantic(ast){
+  const syms={},defLbls=new Set(),usedLbls=new Set(),warns=[];
+  function scan(ns){for(const n of ns){if(n.kind==='label')defLbls.add(n.name);if(n.kind==='cjump'||n.kind==='goto')usedLbls.add(n.target||n.name);if(n.body)scan(n.body);}}
+  function visit(ns){for(const n of ns){
+    if(n.kind==='assign'){syms[n.lhs]={type:'int',line:n.line};if(typeof n.rhs==='object'){[n.rhs.a,n.rhs.b].forEach(v=>{if(isNaN(v)&&!syms[v])syms[v]={type:'int',line:n.line};});}else if(isNaN(n.rhs)&&!syms[n.rhs])syms[n.rhs]={type:'int',line:n.line};}
+    if(['cjump','if','while'].includes(n.kind)){[n.lhs,n.rhs].forEach(v=>{if(isNaN(v)&&!syms[v])syms[v]={type:'int',line:n.line};});}
+    if(n.body)visit(n.body);
+  }}
+  scan(ast);visit(ast);
+  for(const l of usedLbls)if(!defLbls.has(l))warns.push(`Warning: label '${l}' used but not defined`);
+  return{syms,defLbls,usedLbls,warns};
+}
+
+// ── IR GEN ─────────────────────────────────────────────────────────
+let _tc=0,_lc=100;
+const OJ={'>':'JG','<':'JL','>=':'JGE','<=':'JLE','==':'JE','!=':'JNE'};
+const NEG2={'>':'<=','<':'>=','>=':'<','<=':'>','==':'!=','!=':'=='};
+function genIR(ast){
+  _tc=0;_lc=100;
+  const code=[];
+  const e=(op,a='',b='',c='')=>code.push({op,a,b,c});
+  const tmp=()=>`t${++_tc}`;
+  const nl=()=>`__L${++_lc}`;
+  function expr(x){
+    if(typeof x==='object'){const la=expr(x.a),lb=expr(x.b),t=tmp();e({'+':'ADD','-':'SUB','*':'MUL','/':'DIV'}[x.op],t,la,lb);return t;}
+    return String(x);
+  }
+  function vis(ns){for(const n of ns){
+    if(n.kind==='label')e('LABEL',n.name);
+    else if(n.kind==='cjump'){e('CMP',n.lhs,n.op,n.rhs);e('JMP_'+OJ[n.op],n.target);}
+    else if(n.kind==='goto')e('JMP',n.target);
+    else if(n.kind==='assign'){const r=expr(n.rhs);e('MOV',n.lhs,r);}
+    else if(n.kind==='if'){const el=nl(),en=nl();e('CMP',n.lhs,n.op,n.rhs);e('JMP_'+OJ[NEG2[n.op]],el);vis(n.body);e('JMP',en);e('LABEL',el);e('LABEL',en);}
+    else if(n.kind==='while'){const sl=nl(),en=nl();e('LABEL',sl);e('CMP',n.lhs,n.op,n.rhs);e('JMP_'+OJ[NEG2[n.op]],en);vis(n.body);e('JMP',sl);e('LABEL',en);}
+  }}
+  vis(ast);return code;
+}
+
+// ── OPTIMIZER ──────────────────────────────────────────────────────
+function optimize(ir){
+  const code=ir.map(x=>({...x,elim:false,reason:''}));
+  const changes=[];
+  for(let i=0;i<code.length-1;i++){
+    if(!code[i].elim&&code[i].op==='JMP'&&code[i+1].op==='LABEL'&&code[i+1].a===code[i].a){
+      code[i].elim=true;code[i].reason='fall-through';
+      changes.push(`Instr ${i+1}: JMP ${code[i].a} removed — next instr is the target`);
+    }
+  }
+  const seen={};
+  for(let i=0;i<code.length;i++){
+    if(code[i].elim)continue;
+    if(code[i].op==='LABEL'||code[i].op==='JMP'){for(const k in seen)delete seen[k];continue;}
+    if(code[i].op&&code[i].op.startsWith('JMP_')){
+      const k=code[i].op+'_'+code[i].a;
+      if(seen[k]!==undefined){code[i].elim=true;code[i].reason='duplicate';changes.push(`Instr ${i+1}: duplicate ${code[i].op} ${code[i].a} removed`);}
+      else seen[k]=i;
+    }
+  }
+  for(let i=0;i<code.length-1;i++){
+    if(!code[i].elim&&!code[i+1].elim&&code[i].op==='JMP'&&code[i+1].op==='JMP'&&code[i].a===code[i+1].a){
+      code[i+1].elim=true;code[i+1].reason='consecutive';changes.push(`Instr ${i+2}: consecutive JMP ${code[i+1].a} removed`);
+    }
+  }
+  return{optimized:code,changes,removed:code.filter(x=>x.elim).length};
+}
+
+// ── CODEGEN ────────────────────────────────────────────────────────
+const JM={'JMP_JE':'JE','JMP_JNE':'JNE','JMP_JL':'JL','JMP_JLE':'JLE','JMP_JG':'JG','JMP_JGE':'JGE'};
+function codegen(optIR){
+  const lines=[];
+  for(const ins of optIR){
+    if(ins.elim)continue;
+    if(ins.op==='LABEL')lines.push({type:'lbl',text:ins.a+':'});
+    else if(ins.op==='MOV')lines.push({type:'ins',m:'MOV',o:`${ins.a}, ${ins.b}`,c:`; ${ins.a} = ${ins.b}`});
+    else if(['ADD','SUB','MUL','DIV'].includes(ins.op))lines.push({type:'ins',m:ins.op,o:`${ins.a}, ${ins.b}, ${ins.c}`,c:''});
+    else if(ins.op==='CMP')lines.push({type:'ins',m:'CMP',o:`${ins.a}, ${ins.c}`,c:`; ${ins.a} ${ins.b} ${ins.c}`});
+    else if(ins.op==='JMP')lines.push({type:'jmp',m:'JMP',o:ins.a});
+    else if(JM[ins.op])lines.push({type:'jmp',m:JM[ins.op],o:ins.a});
+  }
+  return lines;
+}
+
+// ── RENDER HELPERS ─────────────────────────────────────────────────
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+const TOK_COLORS={IF:'var(--acc5)',WHILE:'var(--acc5)',GOTO:'var(--acc5)',END:'var(--acc5)',
+  ID:'var(--acc3)',NUM:'var(--acc2)',LABEL_DEF:'var(--acc)',
+  EQ:'var(--acc4)',NEQ:'var(--acc4)',LT:'var(--acc4)',GT:'var(--acc4)',LTE:'var(--acc4)',GTE:'var(--acc4)',
+  ASSIGN:'var(--acc4)',PLUS:'var(--acc4)',MINUS:'var(--acc4)',MUL:'var(--acc4)',DIV:'var(--acc4)'};
+
+function renderTokens(toks){
+  let h=`<div class="tok-grid">`;
+  for(const t of toks){
+    const c=TOK_COLORS[t.t]||'var(--txt)';
+    h+=`<div class="tok"><div class="tok-val" style="color:${c}">${esc(t.v)}</div><div class="tok-type">${t.t}</div></div>`;
+  }
+  return h+'</div>';
+}
+
+// ── AST VISUAL TREE ────────────────────────────────────────────────
+// Node color palette by kind
+const AST_COLORS={
+  program:  {fill:'#1a1a2e',stroke:'#00e5ff',text:'#00e5ff'},
+  if:       {fill:'#1e1035',stroke:'#c084fc',text:'#c084fc'},
+  while:    {fill:'#0d2030',stroke:'#00e5ff',text:'#00e5ff'},
+  cjump:    {fill:'#1e1035',stroke:'#ff6b6b',text:'#ff6b6b'},
+  goto:     {fill:'#1a2010',stroke:'#69ff88',text:'#69ff88'},
+  assign:   {fill:'#1e1a10',stroke:'#ffb347',text:'#ffb347'},
+  label:    {fill:'#101a2e',stroke:'#00e5ff',text:'#c8d8ff'},
+  expr:     {fill:'#181820',stroke:'#8888a8',text:'#c9d1d9'},
+};
+
+// Build a tree of layout nodes from AST
+function buildTreeNodes(astNodes){
+  // Wrap all top-level nodes under a synthetic "Program" root
+  const root={kind:'program',label:'PROGRAM',sub:'',children:[]};
+  for(const n of astNodes) root.children.push(toTreeNode(n));
+  return root;
+}
+
+function toTreeNode(n){
+  const node={kind:n.kind,label:'',sub:'',children:[]};
+  if(n.kind==='label'){
+    node.label='LABEL';node.sub=n.name+':';
+  } else if(n.kind==='cjump'){
+    node.label='CJUMP';node.sub=`${n.lhs} ${n.op} ${n.rhs}`;
+    node.children.push({kind:'expr',label:'cond',sub:`${n.lhs}${n.op}${n.rhs}`,children:[]});
+    node.children.push({kind:'goto',label:'goto',sub:n.target,children:[]});
+  } else if(n.kind==='goto'){
+    node.label='GOTO';node.sub=n.target;
+  } else if(n.kind==='assign'){
+    node.label='ASSIGN';node.sub=n.lhs+' =';
+    if(typeof n.rhs==='object'){
+      node.children.push({kind:'expr',label:n.rhs.op,sub:`${n.rhs.a} ${n.rhs.op} ${n.rhs.b}`,children:[
+        {kind:'expr',label:'ID',sub:n.rhs.a,children:[]},
+        {kind:'expr',label:'NUM',sub:n.rhs.b,children:[]},
+      ]});
+    } else {
+      node.children.push({kind:'expr',label:'VAL',sub:String(n.rhs),children:[]});
+    }
+  } else if(n.kind==='if'){
+    node.label='IF';node.sub=`${n.lhs} ${n.op} ${n.rhs}`;
+    node.children.push({kind:'expr',label:'cond',sub:`${n.lhs}${n.op}${n.rhs}`,children:[]});
+    const body={kind:'expr',label:'body',sub:'',children:n.body.map(toTreeNode)};
+    node.children.push(body);
+  } else if(n.kind==='while'){
+    node.label='WHILE';node.sub=`${n.lhs} ${n.op} ${n.rhs}`;
+    node.children.push({kind:'expr',label:'cond',sub:`${n.lhs}${n.op}${n.rhs}`,children:[]});
+    const body={kind:'expr',label:'body',sub:'',children:n.body.map(toTreeNode)};
+    node.children.push(body);
+  }
+  return node;
+}
+
+// Measure subtree width (in node units)
+const NODE_W=86, NODE_H=44, H_GAP=14, V_GAP=52;
+function measureWidth(node){
+  if(!node.children||!node.children.length) return NODE_W;
+  const childWidths=node.children.map(measureWidth);
+  const totalChildren=childWidths.reduce((a,b)=>a+b,0)+(node.children.length-1)*H_GAP;
+  return Math.max(NODE_W, totalChildren);
+}
+
+// Assign x,y positions
+function layoutTree(node, x, y){
+  node.x=x; node.y=y;
+  if(!node.children||!node.children.length) return;
+  const childWidths=node.children.map(measureWidth);
+  const totalW=childWidths.reduce((a,b)=>a+b,0)+(node.children.length-1)*H_GAP;
+  let cx=x - totalW/2;
+  for(let i=0;i<node.children.length;i++){
+    const cw=childWidths[i];
+    layoutTree(node.children[i], cx+cw/2, y+NODE_H+V_GAP);
+    cx+=cw+H_GAP;
+  }
+}
+
+// Render all edges first, then nodes
+function collectEdges(node,arr=[]){
+  if(!node.children) return arr;
+  for(const c of node.children){
+    arr.push([node.x,node.y,c.x,c.y]);
+    collectEdges(c,arr);
+  }
+  return arr;
+}
+function collectNodes(node,arr=[]){
+  arr.push(node);
+  if(node.children) for(const c of node.children) collectNodes(c,arr);
+  return arr;
+}
+
+function getBounds(nodes){
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  for(const n of nodes){
+    minX=Math.min(minX,n.x-NODE_W/2);
+    maxX=Math.max(maxX,n.x+NODE_W/2);
+    minY=Math.min(minY,n.y-NODE_H/2);
+    maxY=Math.max(maxY,n.y+NODE_H/2);
+  }
+  return{minX,minY,maxX,maxY};
+}
+
+function renderASTTree(ast){
+  if(!ast||!ast.length) return '<div class="no-opt">No AST nodes.</div>';
+  const root=buildTreeNodes(ast);
+  const totalW=measureWidth(root);
+  layoutTree(root, totalW/2, NODE_H/2+8);
+  const nodes=collectNodes(root);
+  const edges=collectEdges(root);
+  const b=getBounds(nodes);
+  const pad=16;
+  const svgW=Math.max(300, b.maxX-b.minX+pad*2);
+  const svgH=b.maxY-b.minY+pad*2;
+  const ox=-b.minX+pad;
+  const oy=-b.minY+pad;
+
+  let svg=`<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" xmlns="http://www.w3.org/2000/svg">`;
+  // edges
+  for(const [px,py,cx,cy] of edges){
+    const mx=(px+ox), my=(py+oy+NODE_H/2);
+    const mx2=(cx+ox), my2=(cy+oy-NODE_H/2);
+    const midy=(my+my2)/2;
+    svg+=`<path d="M${mx},${my} C${mx},${midy} ${mx2},${midy} ${mx2},${my2}" fill="none" stroke="rgba(136,136,168,0.4)" stroke-width="1.5"/>`;
+  }
+  // nodes
+  for(const n of nodes){
+    const col=AST_COLORS[n.kind]||AST_COLORS.expr;
+    const nx=n.x+ox, ny=n.y+oy;
+    const hasLabel=n.label;
+    const hasSub=n.sub&&n.sub.length>0;
+    const textY=hasSub?ny-5:ny;
+    svg+=`<g class="ast-node-group">
+      <rect x="${nx-NODE_W/2}" y="${ny-NODE_H/2}" width="${NODE_W}" height="${NODE_H}"
+        rx="7" ry="7" fill="${col.fill}" stroke="${col.stroke}" stroke-width="1.5"/>
+      <text x="${nx}" y="${textY}" class="ast-node-label" fill="${col.text}">${esc(hasLabel)}</text>
+      ${hasSub?`<text x="${nx}" y="${ny+9}" class="ast-node-sub" fill="${col.text}">${esc(n.sub.length>10?n.sub.slice(0,10)+'…':n.sub)}</text>`:''}
+    </g>`;
+  }
+  svg+='</svg>';
+  return `<div class="ast-tree-wrap">${svg}</div>`;
+}
+
+// Original text-based AST code view
+function renderASTCode(ast,d=0){
+  let h='';
+  const ind='&nbsp;'.repeat(d*4);
+  for(const n of ast){
+    if(n.kind==='label')h+=`${ind}<span class="lbl">${esc(n.name)}:</span><br>`;
+    else if(n.kind==='cjump')h+=`${ind}<span class="kw">if</span> <span class="id">${esc(n.lhs)}</span> <span class="op">${esc(n.op)}</span> <span class="lit">${esc(n.rhs)}</span> <span class="kw">goto</span> <span class="lbl">${esc(n.target)}</span><br>`;
+    else if(n.kind==='goto')h+=`${ind}<span class="kw">goto</span> <span class="lbl">${esc(n.target)}</span><br>`;
+    else if(n.kind==='assign'){
+      const r=typeof n.rhs==='object'?`<span class="id">${esc(n.rhs.a)}</span> <span class="op">${esc(n.rhs.op)}</span> <span class="lit">${esc(n.rhs.b)}</span>`:`<span class="lit">${esc(n.rhs)}</span>`;
+      h+=`${ind}<span class="id">${esc(n.lhs)}</span> <span class="op">=</span> ${r}<br>`;
+    }
+    else if(n.kind==='if'){
+      h+=`${ind}<span class="kw">if</span> <span class="id">${esc(n.lhs)}</span> <span class="op">${esc(n.op)}</span> <span class="lit">${esc(n.rhs)}</span> <span class="cmt">{</span><br>`;
+      h+=renderASTCode(n.body,d+1);
+      h+=`${ind}<span class="cmt">}</span><br>`;
+    }
+    else if(n.kind==='while'){
+      h+=`${ind}<span class="kw">while</span> <span class="id">${esc(n.lhs)}</span> <span class="op">${esc(n.op)}</span> <span class="lit">${esc(n.rhs)}</span> <span class="cmt">{</span><br>`;
+      h+=renderASTCode(n.body,d+1);
+      h+=`${ind}<span class="cmt">}</span><br>`;
+    }
+  }
+  return h;
+}
+
+function renderAST(ast){
+  const codeHtml=`<div class="tree">${renderASTCode(ast)}</div>`;
+  const treeHtml=renderASTTree(ast);
+  return `
+    <div class="ast-toggle-bar">
+      <button class="ast-tab active" id="ast-tab-code" onclick="switchAstTab('code')">&#60;/&#62; Code</button>
+      <button class="ast-tab" id="ast-tab-tree" onclick="switchAstTab('tree')">🌲 Tree</button>
+    </div>
+    <div id="ast-view-code" class="ast-view">${codeHtml}</div>
+    <div id="ast-view-tree" class="ast-view" style="display:none">${treeHtml}</div>
+  `;
+}
+
+function switchAstTab(tab){
+  document.getElementById('ast-view-code').style.display=tab==='code'?'':'none';
+  document.getElementById('ast-view-tree').style.display=tab==='tree'?'':'none';
+  document.getElementById('ast-tab-code').classList.toggle('active',tab==='code');
+  document.getElementById('ast-tab-tree').classList.toggle('active',tab==='tree');
+}
+
+function renderSemantic(sem){
+  let h='';
+  if(sem.warns.length){h+=sem.warns.map(w=>`<div class="warn-line">⚠ ${esc(w)}</div>`).join('')+'<br>';}
+  const keys=Object.keys(sem.syms);
+  if(!keys.length)return h+'<div class="no-opt">No variable assignments found.</div>';
+  h+=`<table class="sym-tbl"><thead><tr><th>Name</th><th>Type</th><th>Line</th></tr></thead><tbody>`;
+  for(const k of keys)h+=`<tr><td>${esc(k)}</td><td>${sem.syms[k].type}</td><td>${sem.syms[k].line}</td></tr>`;
+  h+=`</tbody></table>`;
+  h+=`<br><div style="font-size:10px;color:var(--txt2);font-family:var(--mono);">Labels defined: ${[...sem.defLbls].join(', ')||'none'}<br>Labels used: ${[...sem.usedLbls].join(', ')||'none'}</div>`;
+  return h;
+}
+
+function renderIR(code){
+  let h='';
+  for(let i=0;i<code.length;i++){
+    const ins=code[i];
+    h+=`<div class="ir-line${ins.elim?' elim':''}">`;
+    h+=`<span class="ir-n">${i+1}</span>`;
+    if(ins.op==='LABEL')h+=`<span class="ir-lbl">${esc(ins.a)}:</span>`;
+    else if(ins.op==='JMP'||(ins.op&&ins.op.startsWith('JMP_')))h+=`<span class="ir-op">${esc(ins.op)}</span>&nbsp;<span class="ir-lbl">${esc(ins.a)}</span>`;
+    else if(ins.op==='CMP')h+=`<span class="ir-op">CMP</span>&nbsp;<span class="ir-arg">${esc(ins.a)}</span>&nbsp;<span style="color:var(--acc4)">${esc(ins.b)}</span>&nbsp;<span class="ir-arg">${esc(ins.c)}</span>`;
+    else{h+=`<span class="ir-op">${esc(ins.op)}</span>&nbsp;<span class="ir-arg">${esc(ins.a)}</span>`;if(ins.b)h+=`<span style="color:var(--txt3)">,</span>&nbsp;<span class="ir-arg">${esc(ins.b)}</span>`;if(ins.c)h+=`<span style="color:var(--txt3)">,</span>&nbsp;<span class="ir-arg">${esc(ins.c)}</span>`;}
+    if(ins.elim)h+=`<span class="elim-tag">REMOVED: ${ins.reason}</span>`;
+    h+=`</div>`;
+  }
+  return h;
+}
+
+function renderOpt(opt){
+  let h='';
+  if(!opt.changes.length)return`<div class="no-opt">No redundant jumps found — already optimal.</div><br>`+renderIR(opt.optimized);
+  h+=opt.changes.map(c=>`<div class="opt-change">${esc(c)}</div>`).join('');
+  h+='<br>'+renderIR(opt.optimized);
+  return h;
+}
+
+function renderAsm(lines){
+  let h='<div class="asm-out">';
+  for(const l of lines){
+    if(l.type==='lbl')h+=`<div><span class="asm-lbl">${esc(l.text)}</span></div>`;
+    else if(l.type==='jmp')h+=`<div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="asm-jmp">${esc(l.m)}</span>&nbsp;&nbsp;<span class="asm-lbl">${esc(l.o)}</span></div>`;
+    else h+=`<div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="asm-ins">${esc(l.m)}</span>&nbsp;&nbsp;<span class="asm-op">${esc(l.o)}</span>${l.c?` <span class="asm-cmt">${esc(l.c)}</span>`:''}</div>`;
+  }
+  return h+'</div>';
+}
+
+// ── UI HELPERS ─────────────────────────────────────────────────────
+function setCard(i,content,badge,done=false){
+  const card=document.getElementById('card'+i);
+  document.getElementById('body'+i).innerHTML=content;
+  document.getElementById('badge'+i).textContent=badge;
+  card.classList.remove('active','done-card');
+  card.classList.add(done?'done-card':'active');
+  const ps=document.getElementById('ps'+i);
+  ps.classList.remove('active','done');
+  ps.classList.add(done?'done':'active');
+}
+function markDone(i){
+  document.getElementById('card'+i).classList.remove('active');
+  document.getElementById('card'+i).classList.add('done-card');
+  document.getElementById('ps'+i).classList.remove('active');
+  document.getElementById('ps'+i).classList.add('done');
+}
+
+// ── COMPILE ────────────────────────────────────────────────────────
+function compile(){
+  const src=document.getElementById('src').value.trim();
+  const errBox=document.getElementById('err-box');
+  errBox.style.display='none';
+
+  // reset
+  for(let i=0;i<6;i++){
+    document.getElementById('card'+i).classList.remove('active','done-card');
+    document.getElementById('badge'+i).textContent='pending';
+    document.getElementById('ps'+i).classList.remove('active','done');
+  }
+  document.getElementById('opt-pill').classList.remove('show');
+
+  try{
+    // Phase 1
+    const toks=tokenize(src);
+    const disp=toks.filter(t=>t.t!=='NL'&&t.t!=='EOF');
+    setCard(0,renderTokens(disp),disp.length+' tokens',true);
+    document.getElementById('st0').textContent=disp.length;
+
+    // Phase 2
+    const ast=parse([...toks]);
+    setCard(1,renderAST(ast),ast.length+' nodes',true);
+
+    // Phase 3
+    const sem=semantic(ast);
+    setCard(2,renderSemantic(sem),Object.keys(sem.syms).length+' symbols',true);
+
+    // Phase 4
+    const ir=genIR(ast);
+    setCard(3,renderIR(ir),ir.length+' instrs',true);
+    document.getElementById('st1').textContent=ir.length;
+
+    // Phase 5
+    const opt=optimize(ir);
+    setCard(4,renderOpt(opt),opt.removed?opt.removed+' eliminated':'optimal',true);
+    document.getElementById('st2').textContent=opt.removed;
+    if(opt.removed>0){
+      document.getElementById('opt-pill-txt').textContent=opt.removed+' redundant jump'+(opt.removed>1?'s':'')+' eliminated';
+      document.getElementById('opt-pill').classList.add('show');
+    }
+
+    // Phase 6
+    const asm=codegen(opt.optimized);
+    setCard(5,renderAsm(asm),asm.length+' lines',true);
+
+  }catch(e){
+    errBox.style.display='block';
+    errBox.textContent='Error: '+e.message;
+  }
+}
+
+compile();
+
+// ── LANGUAGE SELECTOR ──────────────────────────────────────────────
+const LANG_META={
+  custom:{label:'Custom Lang', color:'var(--acc3)'},
+  c:     {label:'C',           color:'var(--acc)'},
+  python:{label:'Python 3',    color:'var(--acc4)'},
+  java:  {label:'Java',        color:'var(--acc2)'},
+  cpp:   {label:'C++',         color:'var(--acc5)'},
+};
+function onLangChange(val){
+  const meta=LANG_META[val]||LANG_META.custom;
+  const status=document.getElementById('lang-status');
+  const dot=document.querySelector('.lang-dot');
+  if(status) status.textContent=meta.label;
+  if(dot) dot.style.background=meta.color;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+if a == 0 goto L1
+if b != 5 goto L2
+while z < 10
+  z = z + 1
+end
+L1: a = 1
+L2: b = 2
